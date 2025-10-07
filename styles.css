@@ -1,0 +1,444 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family:sans-serif;
+}
+/*..styling header..*/
+
+header {
+    background-color: rgba(68, 60, 60, 0.911);
+    padding-bottom: 10px;
+}
+
+.logo-text {
+    font-size: 40px;
+}
+.hero-section {
+    background-image: url(images/tvwall2.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100%;
+    min-width: 100%;
+    padding-bottom: 10px;
+}
+.navbar :where(#menu-close-button, #menu-open-button){
+    display: none;
+    font-size: 10px;
+}
+
+.section-title{
+    text-align: center;
+    padding: 60px ;
+    font-size: 20px;
+    text-transform: uppercase;
+
+}
+
+.section-title::after{
+    content: "";
+    width: 80px;
+    height: 5px;
+    display: block;
+    margin: 10px auto 0;
+}
+.navbar {
+    color: beige;
+}
+.navbar .link-up{
+    color: beige ;
+}
+
+ul{
+    list-style: none;
+}
+
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: 5%;
+    padding: 10px 18px;
+}
+
+ .link-up {
+    padding: 10px 18px;
+    border-radius: 15px;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.link-up:hover {
+    background-color: rgb(27, 119, 119);
+}
+
+.hero-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 100vh;
+
+}
+.hero-section .hero-details .title {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 70px;
+    font-family: "miniver";
+    color: rgba(243, 243, 238, 0.863);
+    padding-left: 50px;
+}
+
+
+.hero-section .hero-details  {
+    max-width: 70%;
+    margin: 24px 0 40px;
+    padding-left: 50px;
+    color: rgba(243, 243, 238, 0.863);
+}
+/*About section styling*/
+.about-section{
+    padding: 120px 0;
+}
+
+.about-section .section-content {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    justify-content: space-between;
+}
+.about-section .about-image {
+    width: 400px;
+    height: 400px;
+    object-fit: cover;
+}
+.about-section .about-details .section-title {
+    padding: 0;
+}
+.about-section .about-details .text{
+    line-height: 30px;
+    margin: 50px 0 30px;
+    text-align: center;
+}
+/* kitchen  bedroom wardrope livingroom */
+.scroll-container {
+    background-color: #333;
+    overflow: auto;
+    white-space: nowrap;
+    padding: 10px;
+}
+
+.scroll-container img {
+    padding: 10px;
+}
+
+img {
+    width: 600px;
+    height: 400px;
+}
+/* contact section */
+
+input{
+    display: flex;
+    background-color: beige;
+    width: 50%;
+    font-size: 20px;
+    padding: 16px 16px;
+    border-radius: 10px;
+    border-color: black;
+    margin-bottom: 20px;
+}
+
+textarea {
+    display: flex;
+    background-color: white;
+    width: 50%;
+    font-size: 20px;
+    padding: 16px 16px;
+    border-radius: 10px;
+    border-color: black;
+    margin-bottom: 25px;
+
+}
+
+label {
+    display: flex;
+    color: beige;
+}
+
+input:focus-within {
+    outline: none;
+    border-color: blue;
+    border-width: 3px;
+}
+
+textarea:focus-within {
+    outline: none;
+    border-color: blue;
+    border-width: 3px;
+}
+.btn {
+    display: flex;
+    background-color:#0509e2;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: rgb(27, 119, 119);
+}
+.container {
+    border-radius: 5px;
+    background-color: #333;
+    padding: 20px;
+}
+/* footer */
+ .list {
+    display: flex;
+    justify-content:space-evenly;
+    align-items: center;
+    font-size: 40px;
+    cursor: pointer;
+}
+.name:hover {
+    color: rgb(18, 192, 192);
+}
+/* responsive media query code for max width 1024px*/
+@media screen and (max-width: 1024px){ 
+    .hero-section {
+    background-image: url(images/tvwall2.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100%;
+    min-width: 100%;
+    padding-bottom: 10px;
+}
+/* images scroll container */
+.scroll-container {
+    background-color: #333;
+    overflow: auto;
+    white-space: nowrap;
+    padding: 10px;
+}
+
+.scroll-container img {
+    padding: 10px;
+}
+
+img {
+    width: 300px;
+    height: 250px;
+}
+
+}
+/* responsive media query code for max width 900px*/
+@media screen and (max-width: 900px){
+    body.show-mobile-menu header::before {
+        content: '';
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        backdrop-filter: blur(5px);
+        background-color: rgba(0,0,0,0.2);
+    }
+    .nav-menu {
+        display: block;
+        background-color: rgba(81, 81, 88, 0.836);
+        position: fixed;
+        left: -300px;
+        top: 0;
+        width: 300px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-bottom: 200px;
+        transition:left 0.2s ease;
+    }
+    body.show-mobile-menu .navbar .nav-menu{
+    left: 0;
+}
+    .nav-menu .link-up {
+        display: block;
+        margin-top: 17px;
+        font-size: 13px;
+    }
+    .navbar :where(#menu-close-button, #menu-open-button){
+    display: block;
+    font-size: 10px;
+}
+.navbar #menu-close-button {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+    background-color: rgba(255, 0, 0, 0.473);
+    color: white;
+    border-radius: 5px;
+    padding: 2px;
+    cursor: pointer;
+}
+
+.navbar #menu-open-button {
+    position: absolute;
+    right: 30px;
+    top: 30px;
+    border-radius: 10px;
+    border: transparent;
+    background-color: rgba(56, 56, 58, 0.815);
+    color: whitesmoke;
+    cursor: pointer;
+    padding: 10px;
+
+}
+.hero-section .section-content{
+    gap: 50px;
+    text-align: center;
+    padding: 30px 20px 20px;
+    flex-direction: column-reverse;
+    justify-content: center;
+}
+
+.hero-section .hero-details :is(.subtitle) .about-section .about-details{
+    max-width: 100;
+}
+.hero-section {
+    background-image: url(images/tvwall2.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100%;
+    min-width: 100%;
+    padding-bottom: 10px;
+}
+
+.about-section .section-content{
+    gap: 70px;
+    flex-direction: column-reverse;
+}
+
+
+.hero-section .hero-details .title {
+    display:flex;
+    padding: 10px;
+    margin-top: 10px;
+    max-width: 70%;
+    font-size: 20px;
+    padding-left: 50px;
+    color: rgba(243, 243, 238, 0.863);
+}        
+.about-section .about-image {
+    width: 100%;
+    height: 100%;
+    max-width: 250px;
+    aspect-ratio: 1;
+}
+
+/* images scroll container */
+.scroll-container {
+    background-color: #333;
+    overflow: auto;
+    white-space: nowrap;
+    padding: 10px;
+}
+
+.scroll-container img {
+    padding: 10px;
+}
+
+img {
+    width: 200px;
+    height: 150px;
+}
+
+/* contact section */
+
+input{
+    display: flex;
+    background-color: beige;
+    width: 70%;
+    font-size: 20px;
+    padding-left: 16px 20px;
+    border-radius: 10px;
+    border-color: black;
+    margin-bottom: 20px;
+}
+
+textarea {
+    display: flex;
+    background-color: white;
+    width: 70%;
+    font-size: 20px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    border-color: black;
+    margin-bottom: 25px;
+
+}
+
+label {
+    display: flex;
+    color: beige;
+}
+
+input:focus-within {
+    outline: none;
+    border-color: blue;
+    border-width: 3px;
+}
+
+textarea:focus-within {
+    outline: none;
+    border-color: blue;
+    border-width: 3px;
+}
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color:#0509e2;
+    color: white;
+    padding-right: 16px 16px;
+    margin-left: 50px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: rgb(27, 119, 119);
+}
+
+form {
+    margin-left: 50px;
+}
+.container {
+    border-radius: 5px;
+    background-color: #333;
+    padding: 20px;
+}
+/* footer */
+.footerh2{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 20px;
+    font-size: 20px;
+}
+ .list {
+    display: flex;
+    justify-content:space-evenly;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.name:hover {
+    color: rgb(18, 192, 192);
+}
+
+}
