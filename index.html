@@ -1,130 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLEXX INTERIOR</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flexx Interior</title>
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <!--header/navbar-->
-    <header>
-        <nav class="navbar">
-            <h1 class="logo-text">FLEXX INTERIOR</h1>
-            <ul class="nav-menu">
-                <button id="menu-close-button">X</button>
-                <li><a href="#about" class="link-up">ABOUT US</a></li>
-                <li><a href="#kitchen" class="link-up">KITCHEN</a></li>
-                <li><a href="#livingroom" class="link-up">LIVING ROOM</a></li>
-                <li><a href="#bedroom" class="link-up">BEDROOM</a></li>
-                 <li><a href="#contact" class="link-up">CONTACT</a></li>
-            </ul>
-            <button id="menu-open-button">MENU</button>
-        </nav>
-    </header>
-    <main>
-        <!--hero-section-->
-        <section class="hero-section">
-            <div class="section-content">
-                <div class="hero-details">                   
-                    <h2 class="title">WELCOME to flexx Interior</h2>
-                </div>
 
-            </div>
-        </section>
-        <!--ABOUT SECTION-->
-        <section class="about-section" id="about">
-            <div class="section-content">
-                <div class="about-image">
-                    <img src="images/tvwall9.jpg" alt="about" class="about-image" >
-                </div>
-                <div class="about-details">
+<header>
+  <nav class="navbar">
+    <h1 class="logo">FLEXX INTERIOR</h1>
+    <button class="menu-toggle" id="menu-toggle"><i class="fa fa-bars"></i></button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#kitchen">Kitchen Projects</a></li>
+      <li><a href="#living">Living Room</a></li>
+      <li><a href="#bedroom">Bedroom</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
 
-                    <h2 class="section-title">ABOUT US</h2>
-                    <p class="text">
-                         <b>FLEXX INTERIOR</b> main focus is on building homes interior using boards and plywood to build wonderful interior finishes 
-                        and making your home more modern.
-                    </p>
-            </div>
-        </section>
-        <!--Kitchen section-->
-        <section class="kitchen-section" id="kitchen">
-            <h2 class="section-title">KITCHEN</h2>
-            <p>Below are some of the kitchen slides the proccess we have done from the first contsruction to the finished product of the look of the kitchen we did for our clients</p>
-            <div class="scroll-container">
-                <img src="images/kitchen1.jpg" alt="kitchen1" >
-                <img src="images/kitchen2.jpg" alt="kitchen2" >
-                <img src="images/kitchen3.jpg" alt="kitchen3" >
-                <img src="images/kitchen4.jpg" alt="kitchen4" >
-                <img src="images/kitchen5.jpg" alt="kitchen5" >
-                <img src="images/kitchen6.jpg" alt="kitchen6" >
-                <img src="images/kitchen7.jpg" alt="kitchen7" >
-                <img src="images/kitchen8.jpg" alt="kitchen8" >
-                <img src="images/kitchen9.jpg" alt="kitchen9" >
-            </div>
-        </section>
-        <!--livingroom section-->
-        <section class="livingroom-section" id="livingroom">
-            <h2 class="section-title">LIVINGROOM</h2>
-            <p>Below are some of the livingroom slides the proccess we have done from the first contsruction to the finished product of the look of the Living room tv wall unit we did for our clients</p>
-            <div class="scroll-container">
-                <img src="images/tvwall1.jpg" alt="tvwall1" >
-                <img src="images/tvwall2.jpg" alt="tvwall2" >
-                <img src="images/tvwall3.jpg" alt="tvwall3" >
-                <img src="images/tvwall4.jpg" alt="tvwall4" >
-                <img src="images/tvwall5.jpg" alt="tvwall5" >
-                <img src="images/tvwall6.jpg" alt="tvwall6" >
-                <img src="images/tvwall7.jpg" alt="tvwall7" >
-                <img src="images/tvwall8.jpg" alt="tvwall8" >
-                <img src="images/tvwall9.jpg" alt="tvwall9" >
-            </div>
-        </section>
-        <!--Bedroom section--> 
-        <section class="bedroom-section" id="bedroom">
-            <h2 class="section-title">BEDROOM</h2>
-            <p>Below are some of the Bedroom slides the proccess we have done from the first contsruction to the finished product of the look of the Living room tv wall unit we did for our clients</p>
-            <div class="scroll-container">
-                <img src="images/wardrope1.jpg" alt="wardrope1">
-                <img src="images/wardrope2.jpg" alt="wardrope2" >
-                <img src="images/wardrope3.jpg" alt="wardrope3" >
-                <img src="images/wardrope4.jpg" alt="wardrope4" >
-                <img src="images/wardrope5.jpg" alt="wardrope5" >
-                <img src="images/wardrope6.jpg" alt="wardrope6" >
-                <img src="images/wardrope7.jpg" alt="wardrope7" >
-                <img src="images/wardrope8.jpg" alt="wardrope8" >
-                <img src="images/wardrope9.jpg" alt="wardrope9" >
-            </div>
-        </section>
-        <!--Contact section-->
-        <section class="contact-section" id="contact">
-            <h2 class="section-title">CONTACT US</h2>
-            <div class="container">
-                <form action="https://formsubmit.co/ochiengb215@gmail.com" method="POST">
-                    <label for="firstname">FIRST NAME</label>
-                    <input type="text" id="firstname" name="name" placeholder="firstname"  required>
-                    <label for="lastname">LAST NAME</label> 
-                    <input type="text" id="lastname" name="lastname" placeholder="lastname" required>
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" placeholder="email address">
-                    <label for="text">TEXT</label>
-                    <textarea id="text" name="text" placeholder="write something..."></textarea>
-                    <button class="btn">SUBMIT</button>
-                </form>
-            </div>
-        </section>
-        <footer>
-            <h2 class="footerh2">Follow us </h2>
-             <div class="footer">
-                <ul class="list">
-                    <li class="name"><i class="fa-brands fa-instagram"></i></li>
-                    <li class="name"><i class="fa-brands fa-whatsapp"></i></li>
-                    <li class="name"><i class="fa-brands fa-facebook"></i></li>
-                    <li class="name"><i class="fa-solid fa-phone"></i></li>
-                </ul>
-            </div>
-        </footer>                                         
-    </main>
-    <script src="script.js"></script>
+<section class="hero">
+  <h2>Modern Interior Design</h2>
+  <p>Beautiful kitchen, bedroom and living room interiors designed with precision and quality materials.</p>
+  <a href="#contact" class="btn">Request a Quote</a>
+</section>
+
+<section id="about" class="section">
+  <h2>About Flexx Interior</h2>
+  <p>Flexx Interior specializes in modern interior designs using high-quality boards and plywood.</p>
+</section>
+
+<!-- KITCHEN -->
+<section id="kitchen" class="section">
+  <h2>Kitchen Projects</h2>
+  <div class="gallery" id="kitchen-gallery"></div>
+</section>
+
+<!-- LIVING ROOM -->
+<section id="living" class="section">
+  <h2>Living Room TV Wall Units</h2>
+  <div class="gallery" id="living-gallery"></div>
+</section>
+
+<!-- BEDROOM -->
+<section id="bedroom" class="section">
+  <h2>Bedroom Wardrobes</h2>
+  <div class="gallery" id="bedroom-gallery"></div>
+</section>
+
+<section id="contact" class="section">
+  <h2>Contact Us</h2>
+  <form action="https://formsubmit.co/91dc9ef5428d559ae71abd74a65e57b1" method="POST">
+    <input type="text" name="name" placeholder="First Name" required>
+    <input type="text" name="lastname" placeholder="Last Name" required>
+    <input type="email" name="email" placeholder="Email">
+    <textarea name="message" placeholder="Write your message"></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+</section>
+
+<a href="https://wa.me/254748615758" class="whatsapp" target="_blank">
+  <i class="fa-brands fa-whatsapp"></i>
+</a>
+
+<footer>
+  <p>© 2026 Flexx Interior</p>
+  <div class="social">
+    <i class="fa-brands fa-facebook"></i>
+    <i class="fa-brands fa-instagram"></i>
+    <i class="fa-solid fa-phone"></i>
+  </div>
+</footer>
+
+<script>
+const supabaseUrl = "YOUR_FLEXX_SUPABASE_URL";
+const supabaseKey = "YOUR_FLEXX_SUPABASE_ANON_KEY";
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+// Load projects dynamically
+async function loadProjects(category, galleryId) {
+  const { data } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('category', category)
+    .order('created_at', { ascending: false });
+
+  const gallery = document.getElementById(galleryId);
+  gallery.innerHTML = '';
+
+  data.forEach(project => {
+    const card = document.createElement('div');
+    card.className = 'project-card';
+    card.innerHTML = `<img src="${project.after_url}">`;
+    gallery.appendChild(card);
+  });
+}
+
+// Load each category
+loadProjects('kitchen', 'kitchen-gallery');
+loadProjects('living', 'living-gallery');
+loadProjects('bedroom', 'bedroom-gallery');
+
+// Mobile menu toggle
+const toggleButton = document.getElementById("menu-toggle");
+const navLinks = document.getElementById("nav-links");
+
+toggleButton.addEventListener("click", () => navLinks.classList.toggle("active"));
+document.querySelectorAll("#nav-links a").forEach(link => {
+  link.addEventListener("click", () => navLinks.classList.remove("active"));
+});
+</script>
 </body>
 </html>

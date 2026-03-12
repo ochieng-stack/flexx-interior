@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flexx Interior Admin</title>
+<link rel="stylesheet" href="admin.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="admin-container">
+
+<h2>Admin Login</h2>
+<form id="login-form">
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button type="submit">Login</button>
+</form>
+
+<form id="admin-form" style="display:none;">
+  <h2>Upload Project</h2>
+
+  <label>Category</label>
+  <select id="category">
+    <option value="kitchen">Kitchen</option>
+    <option value="living">Living Room</option>
+    <option value="bedroom">Bedroom</option>
+  </select>
+
+  <label>Before Image</label>
+  <input type="file" id="before" required>
+
+  <label>During Image</label>
+  <input type="file" id="during" required>
+
+  <label>After Image</label>
+  <input type="file" id="after" required>
+
+  <button type="submit">Publish Project</button>
+  <button id="logout">Logout</button>
+</form>
+
+</div>
+
+<script>
+const supabaseUrl = "YOUR_FLEXX_SUPABASE_URL";
+const supabaseKey = "YOUR_FLEXX_SUPABASE_ANON_KEY";
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+const loginForm = document.getElementById('login-form');
+const adminForm = document.getElementById('admin-form');
+const logoutBtn = document.getElementById('logout');
+
+// Login
+loginForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+  if (error) return alert("Login failed: " + error.message);
+
+  loginForm.style.display = 'none';
+  adminForm.style.display = 'block';
+});
+
+// Logout
+logoutBtn.addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
+  adminForm.style.display = 'none';
+  loginForm.style.display = 'block';
+});
+
+// Admin upload
+adminForm.addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const category = document.getElementById('category').value;
+  const beforeFile = document.getElementById('before').files[0];
+  const duringFile = document.getElementById('during').files[0];
+  const afterFile = document.getElementById('after').files[0];
+
+  const beforeUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+beforeFile.name, beforeFile);
+  const duringUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+duringFile.name, duringFile);
+  const afterUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+afterFile.name, afterFile);
+
+  const { data: beforeURL } = supabaseClient.storage.from('projects').getPublicUrl(beforeUpload.data.path);
+  const { data: duringURL } = supabaseClient.storage.from('projects').getPublicUrl(duringUpload.data.path);
+  const { data: afterURL } = supabaseClient.storage.from('projects').getPublicUrl(afterUpload.data.path);
+
+  // Delete oldest if > 8
+  const { data: existing } = await supabaseClient.from('projects').select('*').eq('category', category).order('created_at', { ascending: true });
+  if(existing.length >= 8){
+    await supabaseClient.from('projects').delete().eq('id', existing[0].id);
+  }
+
+  // Insert new project
+  await supabaseClient.from('projects').insert([{
+    category,
+    before_url: beforeURL.publicUrl,
+    during_url: duringURL.publicUrl,
+    after_url: afterURL.publicUrl
+  }]);
+
+  alert("Project Published!");
+});
+</script>
+
+</body>
+</html>
