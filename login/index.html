@@ -4,122 +4,278 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flexx Interior Admin</title>
+
 <link rel="stylesheet" href="admin.css">
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
 </head>
 <body>
 
 <div class="admin-container">
 
 <h2>Admin Login</h2>
+
 <form id="login-form">
-  <input type="email" id="email" placeholder="Email" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <button type="submit">Login</button>
+
+<input type="email" id="email" placeholder="Email" required>
+
+<input type="password" id="password" placeholder="Password" required>
+
+<button type="submit">Login</button>
+
 </form>
 
+
 <form id="admin-form" style="display:none;">
-  <h2>Upload Project</h2>
 
-  <label>Category</label>
-  <select id="category">
-    <option value="kitchen">Kitchen</option>
-    <option value="living">Living Room</option>
-    <option value="bedroom">Bedroom</option>
-  </select>
+<h2>Upload Project</h2>
 
-  <label>Before Image</label>
-  <input type="file" id="before" required>
+<label>Category</label>
 
-  <label>During Image</label>
-  <input type="file" id="during" required>
+<select id="category">
+<option value="kitchen">Kitchen</option>
+<option value="living">Living Room</option>
+<option value="bedroom">Bedroom</option>
+</select>
 
-  <label>After Image</label>
-  <input type="file" id="after" required>
+<label>Before Image</label>
+<input type="file" id="before" required>
 
-  <button type="submit">Publish Project</button>
-  <button type="button" id="logout">Logout</button>
+<label>During Image</label>
+<input type="file" id="during" required>
+
+<label>After Image</label>
+<input type="file" id="after" required>
+
+<button type="submit">Publish Project</button>
+
+<button type="button" id="logout">Logout</button>
+
 </form>
 
 </div>
 
 <script>
+
 const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
+
 const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZWV3ZHJ5cXBybW1pdmV2dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjI5NTUsImV4cCI6MjA4ODgzODk1NX0.iEGsupGU9cm-irl6Yq00sz3YruxVmeW8IHQW62f7MbI";
+
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-const loginForm = document.getElementById('login-form');
-const adminForm = document.getElementById('admin-form');
-const logoutBtn = document.getElementById('logout');
 
-// Check session on page load
+const loginForm = document.getElementById("login-form");
+
+const adminForm = document.getElementById("admin-form");
+
+const logoutBtn = document.getElementById("logout");
+
+
 async function checkSession(){
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if(session){
-    loginForm.style.display = 'none';
-    adminForm.style.display = 'block';
-  } else {
-    loginForm.style.display = 'block';
-    adminForm.style.display = 'none';
-  }
+
+const { data } = await supabaseClient.auth.getSession();
+
+if(data.session){
+
+loginForm.style.display = "none";
+
+adminForm.style.display = "block";
+
+}
+
 }
 
 checkSession();
 
-// Login
-loginForm.addEventListener('submit', async e => {
-  e.preventDefault();
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+loginForm.addEventListener("submit", async (e)=>{
 
-  if(error) return alert("Login failed: " + error.message);
+e.preventDefault();
 
-  loginForm.style.display = 'none';
-  adminForm.style.display = 'block';
+const email = document.getElementById("email").value;
+
+const password = document.getElementById("password").value;
+
+const { error } = await supabaseClient.auth.signInWithPassword({
+
+email:email,
+
+password:password
+
 });
 
-// Logout
-logoutBtn.addEventListener('click', async () => {
-  await supabaseClient.auth.signOut();
-  loginForm.style.display = 'block';
-  adminForm.style.display = 'none';
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+loginForm.style.display = "none";
+
+adminForm.style.display = "block";
+
 });
 
-// Admin upload
-adminForm.addEventListener('submit', async e => {
-  e.preventDefault();
 
-  const category = document.getElementById('category').value;
-  const beforeFile = document.getElementById('before').files[0];
-  const duringFile = document.getElementById('during').files[0];
-  const afterFile = document.getElementById('after').files[0];
+logoutBtn.addEventListener("click", async ()=>{
 
-  const beforeUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+beforeFile.name, beforeFile);
-  const duringUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+duringFile.name, duringFile);
-  const afterUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+afterFile.name, afterFile);
+await supabaseClient.auth.signOut();
 
-  const beforeURL = supabaseClient.storage.from('projects').getPublicUrl(beforeUpload.data.path).data.publicUrl;
-  const duringURL = supabaseClient.storage.from('projects').getPublicUrl(duringUpload.data.path).data.publicUrl;
-  const afterURL = supabaseClient.storage.from('projects').getPublicUrl(afterUpload.data.path).data.publicUrl;
+loginForm.style.display = "block";
 
-  // Delete oldest if > 8
-  const { data: existing } = await supabaseClient.from('projects').select('*').eq('category', category).order('created_at', { ascending: true });
-  if(existing.length >= 8){
-    await supabaseClient.from('projects').delete().eq('id', existing[0].id);
-  }
+adminForm.style.display = "none";
 
-  // Insert new project
-  await supabaseClient.from('projects').insert([{
-    category,
-    before_url: beforeURL,
-    during_url: duringURL,
-    after_url: afterURL
-  }]);
-
-  alert("Project Published!");
 });
+
+
+adminForm.addEventListener("submit", async (e)=>{
+
+e.preventDefault();
+
+const category = document.getElementById("category").value;
+
+const beforeFile = document.getElementById("before").files[0];
+
+const duringFile = document.getElementById("during").files[0];
+
+const afterFile = document.getElementById("after").files[0];
+
+const beforeName = Date.now()+"-"+beforeFile.name;
+
+const duringName = Date.now()+"-"+duringFile.name;
+
+const afterName = Date.now()+"-"+afterFile.name;
+
+
+const beforeUpload = await supabaseClient.storage
+
+.from("projects")
+
+.upload(beforeName,beforeFile);
+
+
+if(beforeUpload.error){
+
+alert(beforeUpload.error.message);
+
+return;
+
+}
+
+
+const duringUpload = await supabaseClient.storage
+
+.from("projects")
+
+.upload(duringName,duringFile);
+
+
+if(duringUpload.error){
+
+alert(duringUpload.error.message);
+
+return;
+
+}
+
+
+const afterUpload = await supabaseClient.storage
+
+.from("projects")
+
+.upload(afterName,afterFile);
+
+
+if(afterUpload.error){
+
+alert(afterUpload.error.message);
+
+return;
+
+}
+
+
+const beforeURL = supabaseClient.storage
+
+.from("projects")
+
+.getPublicUrl(beforeName).data.publicUrl;
+
+
+const duringURL = supabaseClient.storage
+
+.from("projects")
+
+.getPublicUrl(duringName).data.publicUrl;
+
+
+const afterURL = supabaseClient.storage
+
+.from("projects")
+
+.getPublicUrl(afterName).data.publicUrl;
+
+
+const { data: existing } = await supabaseClient
+
+.from("projects")
+
+.select("*")
+
+.eq("category",category)
+
+.order("created_at",{ascending:true});
+
+
+if(existing && existing.length >= 8){
+
+await supabaseClient
+
+.from("projects")
+
+.delete()
+
+.eq("id",existing[0].id);
+
+}
+
+
+const { error } = await supabaseClient
+
+.from("projects")
+
+.insert([{
+
+category:category,
+
+before_url:beforeURL,
+
+during_url:duringURL,
+
+after_url:afterURL
+
+}]);
+
+
+if(error){
+
+alert("Database error: "+error.message);
+
+return;
+
+}
+
+
+alert("Project Published Successfully!");
+
+adminForm.reset();
+
+});
+
 </script>
 
 </body>

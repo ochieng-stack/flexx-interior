@@ -1,40 +1,25 @@
 body{
 font-family:Arial;
-background:#f4f4f4;
-padding:40px;
+background:#f5f5f5;
 }
 
 .admin-container{
 max-width:500px;
-margin:auto;
+margin:50px auto;
 background:white;
 padding:30px;
 border-radius:8px;
-box-shadow:0 0 10px rgba(0,0,0,0.1);
+box-shadow:0 5px 20px rgba(0,0,0,0.1);
 }
 
-h2{
-text-align:center;
-margin-bottom:20px;
-}
-
-label{
-display:block;
-margin-top:10px;
-}
-
-input, select{
+input, select, button{
 width:100%;
-padding:10px;
-margin-top:5px;
-border:1px solid #ccc;
-border-radius:4px;
+padding:12px;
+margin-top:10px;
+margin-bottom:15px;
 }
 
 button{
-margin-top:20px;
-width:100%;
-padding:12px;
 background:black;
 color:white;
 border:none;
@@ -42,5 +27,5 @@ cursor:pointer;
 }
 
 button:hover{
-background:#d4a24c;
+opacity:0.8;
 }
