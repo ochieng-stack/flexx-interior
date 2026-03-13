@@ -38,7 +38,7 @@
   <input type="file" id="after" required>
 
   <button type="submit">Publish Project</button>
-  <button id="logout">Logout</button>
+  <button type="button" id="logout">Logout</button>
 </form>
 
 </div>
@@ -52,6 +52,20 @@ const loginForm = document.getElementById('login-form');
 const adminForm = document.getElementById('admin-form');
 const logoutBtn = document.getElementById('logout');
 
+// Check session on page load
+async function checkSession(){
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if(session){
+    loginForm.style.display = 'none';
+    adminForm.style.display = 'block';
+  } else {
+    loginForm.style.display = 'block';
+    adminForm.style.display = 'none';
+  }
+}
+
+checkSession();
+
 // Login
 loginForm.addEventListener('submit', async e => {
   e.preventDefault();
@@ -60,7 +74,7 @@ loginForm.addEventListener('submit', async e => {
 
   const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-  if (error) return alert("Login failed: " + error.message);
+  if(error) return alert("Login failed: " + error.message);
 
   loginForm.style.display = 'none';
   adminForm.style.display = 'block';
@@ -69,8 +83,8 @@ loginForm.addEventListener('submit', async e => {
 // Logout
 logoutBtn.addEventListener('click', async () => {
   await supabaseClient.auth.signOut();
-  adminForm.style.display = 'none';
   loginForm.style.display = 'block';
+  adminForm.style.display = 'none';
 });
 
 // Admin upload
@@ -86,9 +100,9 @@ adminForm.addEventListener('submit', async e => {
   const duringUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+duringFile.name, duringFile);
   const afterUpload = await supabaseClient.storage.from('projects').upload(Date.now()+'-'+afterFile.name, afterFile);
 
-  const { data: beforeURL } = supabaseClient.storage.from('projects').getPublicUrl(beforeUpload.data.path);
-  const { data: duringURL } = supabaseClient.storage.from('projects').getPublicUrl(duringUpload.data.path);
-  const { data: afterURL } = supabaseClient.storage.from('projects').getPublicUrl(afterUpload.data.path);
+  const beforeURL = supabaseClient.storage.from('projects').getPublicUrl(beforeUpload.data.path).data.publicUrl;
+  const duringURL = supabaseClient.storage.from('projects').getPublicUrl(duringUpload.data.path).data.publicUrl;
+  const afterURL = supabaseClient.storage.from('projects').getPublicUrl(afterUpload.data.path).data.publicUrl;
 
   // Delete oldest if > 8
   const { data: existing } = await supabaseClient.from('projects').select('*').eq('category', category).order('created_at', { ascending: true });
@@ -99,9 +113,9 @@ adminForm.addEventListener('submit', async e => {
   // Insert new project
   await supabaseClient.from('projects').insert([{
     category,
-    before_url: beforeURL.publicUrl,
-    during_url: duringURL.publicUrl,
-    after_url: afterURL.publicUrl
+    before_url: beforeURL,
+    during_url: duringURL,
+    after_url: afterURL
   }]);
 
   alert("Project Published!");
