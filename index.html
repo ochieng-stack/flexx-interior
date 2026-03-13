@@ -82,42 +82,58 @@
 </footer>
 
 <script>
-const supabaseUrl = "YOUR_FLEXX_SUPABASE_URL";
-const supabaseKey = "YOUR_FLEXX_SUPABASE_ANON_KEY";
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-// Load projects dynamically
-async function loadProjects(category, galleryId) {
-  const { data } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('category', category)
-    .order('created_at', { ascending: false });
+// MOBILE MENU (runs first and always works)
 
-  const gallery = document.getElementById(galleryId);
-  gallery.innerHTML = '';
-
-  data.forEach(project => {
-    const card = document.createElement('div');
-    card.className = 'project-card';
-    card.innerHTML = `<img src="${project.after_url}">`;
-    gallery.appendChild(card);
-  });
-}
-
-// Load each category
-loadProjects('kitchen', 'kitchen-gallery');
-loadProjects('living', 'living-gallery');
-loadProjects('bedroom', 'bedroom-gallery');
-
-// Mobile menu toggle
 const toggleButton = document.getElementById("menu-toggle");
 const navLinks = document.getElementById("nav-links");
 
-toggleButton.addEventListener("click", () => navLinks.classList.toggle("active"));
-document.querySelectorAll("#nav-links a").forEach(link => {
-  link.addEventListener("click", () => navLinks.classList.remove("active"));
+toggleButton.addEventListener("click", () => {
+  navLinks.classList.toggle("active");
 });
+
+document.querySelectorAll("#nav-links a").forEach(link => {
+  link.addEventListener("click", () => {
+    navLinks.classList.remove("active");
+  });
+});
+
+
+// SUPABASE PART (only runs if Supabase loads)
+
+if (typeof supabase !== "undefined") {
+
+const supabaseUrl = "YOUR_FLEXX_SUPABASE_URL";
+const supabaseKey = "YOUR_FLEXX_SUPABASE_ANON_KEY";
+
+const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+async function loadProjects(category, galleryId) {
+
+  const { data } = await client
+    .from("projects")
+    .select("*")
+    .eq("category", category)
+    .order("created_at", { ascending: false });
+
+  const gallery = document.getElementById(galleryId);
+  gallery.innerHTML = "";
+
+  data.forEach(project => {
+    const card = document.createElement("div");
+    card.className = "project-card";
+    card.innerHTML = `<img src="${project.after_url}">`;
+    gallery.appendChild(card);
+  });
+
+}
+
+loadProjects("kitchen","kitchen-gallery");
+loadProjects("living","living-gallery");
+loadProjects("bedroom","bedroom-gallery");
+
+}
+
 </script>
 </body>
 </html>
