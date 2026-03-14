@@ -82,9 +82,7 @@
 </footer>
 
 <script>
-
-// MOBILE MENU (runs first and always works)
-
+// MOBILE MENU
 const toggleButton = document.getElementById("menu-toggle");
 const navLinks = document.getElementById("nav-links");
 
@@ -98,42 +96,50 @@ document.querySelectorAll("#nav-links a").forEach(link => {
   });
 });
 
-
-// SUPABASE PART (only runs if Supabase loads)
-
+// SUPABASE PROJECTS FETCH AND IMAGE CYCLE
 if (typeof supabase !== "undefined") {
 
-const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZWV3ZHJ5cXBybW1pdmV2dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjI5NTUsImV4cCI6MjA4ODgzODk1NX0.iEGsupGU9cm-irl6Yq00sz3YruxVmeW8IHQW62f7MbI";
+  const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZWV3ZHJ5cXBybW1pdmV2dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjI5NTUsImV4cCI6MjA4ODgzODk1NX0.iEGsupGU9cm-irl6Yq00sz3YruxVmeW8IHQW62f7MbI";
 
-const client = supabase.createClient(supabaseUrl, supabaseKey);
+  const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-async function loadProjects(category, galleryId) {
+  async function loadProjects(category, galleryId) {
+    const { data } = await client
+      .from("projects")
+      .select("*")
+      .eq("category", category)
+      .order("created_at", { ascending: false });
 
-  const { data } = await client
-    .from("projects")
-    .select("*")
-    .eq("category", category)
-    .order("created_at", { ascending: false });
+    const gallery = document.getElementById(galleryId);
+    gallery.innerHTML = "";
 
-  const gallery = document.getElementById(galleryId);
-  gallery.innerHTML = "";
+    data.forEach(project => {
+      const card = document.createElement("div");
+      card.className = "project-card";
 
-  data.forEach(project => {
-    const card = document.createElement("div");
-    card.className = "project-card";
-    card.innerHTML = `<img src="${project.after_url}">`;
-    gallery.appendChild(card);
-  });
+      // Set up cycling images
+      const images = [project.before_url, project.during_url, project.after_url];
+      let index = 2; // Start with AFTER image
+      const img = document.createElement("img");
+      img.src = images[index];
+      img.className = "project-img";
 
+      img.addEventListener("click", () => {
+        index = (index + 1) % images.length;
+        img.src = images[index];
+      });
+
+      card.appendChild(img);
+      gallery.appendChild(card);
+    });
+  }
+
+  // Load projects for each category
+  loadProjects("kitchen","kitchen-gallery");
+  loadProjects("living","living-gallery");
+  loadProjects("bedroom","bedroom-gallery");
 }
-
-loadProjects("kitchen","kitchen-gallery");
-loadProjects("living","living-gallery");
-loadProjects("bedroom","bedroom-gallery");
-
-}
-
 </script>
 </body>
 </html>
