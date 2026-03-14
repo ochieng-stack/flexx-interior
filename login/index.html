@@ -11,6 +11,7 @@
 
 
 </head>
+
 <body>
 
 <div class="admin-container">
@@ -55,10 +56,13 @@
 
 </form>
 
-</div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+<!-- LIST OF PROJECTS -->
+<div id="project-list" class="project-list"></div>
 
+</div>
+
+
+<script>
 
 const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
 
@@ -73,7 +77,10 @@ const adminForm = document.getElementById("admin-form");
 
 const logoutBtn = document.getElementById("logout");
 
+const projectList = document.getElementById("project-list");
 
+
+// CHECK LOGIN
 async function checkSession(){
 
 const { data } = await supabaseClient.auth.getSession();
@@ -84,6 +91,8 @@ loginForm.style.display = "none";
 
 adminForm.style.display = "block";
 
+loadProjects();
+
 }
 
 }
@@ -91,6 +100,7 @@ adminForm.style.display = "block";
 checkSession();
 
 
+// LOGIN
 loginForm.addEventListener("submit", async (e)=>{
 
 e.preventDefault();
@@ -115,24 +125,30 @@ return;
 
 }
 
-loginForm.style.display = "none";
+loginForm.style.display="none";
 
-adminForm.style.display = "block";
+adminForm.style.display="block";
+
+loadProjects();
 
 });
 
 
+// LOGOUT
 logoutBtn.addEventListener("click", async ()=>{
 
 await supabaseClient.auth.signOut();
 
-loginForm.style.display = "block";
+loginForm.style.display="block";
 
-adminForm.style.display = "none";
+adminForm.style.display="none";
+
+projectList.innerHTML="";
 
 });
 
 
+// PUBLISH PROJECT
 adminForm.addEventListener("submit", async (e)=>{
 
 e.preventDefault();
@@ -145,6 +161,7 @@ const duringFile = document.getElementById("during").files[0];
 
 const afterFile = document.getElementById("after").files[0];
 
+
 const beforeName = Date.now()+"-"+beforeFile.name;
 
 const duringName = Date.now()+"-"+duringFile.name;
@@ -152,104 +169,24 @@ const duringName = Date.now()+"-"+duringFile.name;
 const afterName = Date.now()+"-"+afterFile.name;
 
 
-const beforeUpload = await supabaseClient.storage
+// UPLOAD FILES
+await supabaseClient.storage.from("projects").upload(beforeName,beforeFile);
 
-.from("projects")
+await supabaseClient.storage.from("projects").upload(duringName,duringFile);
 
-.upload(beforeName,beforeFile);
-
-
-if(beforeUpload.error){
-
-alert(beforeUpload.error.message);
-
-return;
-
-}
+await supabaseClient.storage.from("projects").upload(afterName,afterFile);
 
 
-const duringUpload = await supabaseClient.storage
+// GET URLS
+const beforeURL = supabaseClient.storage.from("projects").getPublicUrl(beforeName).data.publicUrl;
 
-.from("projects")
+const duringURL = supabaseClient.storage.from("projects").getPublicUrl(duringName).data.publicUrl;
 
-.upload(duringName,duringFile);
-
-
-if(duringUpload.error){
-
-alert(duringUpload.error.message);
-
-return;
-
-}
+const afterURL = supabaseClient.storage.from("projects").getPublicUrl(afterName).data.publicUrl;
 
 
-const afterUpload = await supabaseClient.storage
-
-.from("projects")
-
-.upload(afterName,afterFile);
-
-
-if(afterUpload.error){
-
-alert(afterUpload.error.message);
-
-return;
-
-}
-
-
-const beforeURL = supabaseClient.storage
-
-.from("projects")
-
-.getPublicUrl(beforeName).data.publicUrl;
-
-
-const duringURL = supabaseClient.storage
-
-.from("projects")
-
-.getPublicUrl(duringName).data.publicUrl;
-
-
-const afterURL = supabaseClient.storage
-
-.from("projects")
-
-.getPublicUrl(afterName).data.publicUrl;
-
-
-const { data: existing } = await supabaseClient
-
-.from("projects")
-
-.select("*")
-
-.eq("category",category)
-
-.order("created_at",{ascending:true});
-
-
-if(existing && existing.length >= 8){
-
-await supabaseClient
-
-.from("projects")
-
-.delete()
-
-.eq("id",existing[0].id);
-
-}
-
-
-const { error } = await supabaseClient
-
-.from("projects")
-
-.insert([{
+// INSERT INTO DATABASE
+const { error } = await supabaseClient.from("projects").insert([{
 
 category:category,
 
@@ -264,18 +201,107 @@ after_url:afterURL
 
 if(error){
 
-alert("Database error: "+error.message);
+alert(error.message);
 
 return;
 
 }
 
-
-alert("Project Published Successfully!");
+alert("Project Published!");
 
 adminForm.reset();
 
+loadProjects();
+
 });
+
+
+// LOAD PROJECT LIST
+async function loadProjects(){
+
+projectList.innerHTML="";
+
+const { data } = await supabaseClient
+
+.from("projects")
+
+.select("*")
+
+.order("created_at",{ascending:false});
+
+
+data.forEach(project=>{
+
+const div=document.createElement("div");
+
+div.className="project-item";
+
+
+div.innerHTML=`
+
+<h4>${project.category.toUpperCase()} PROJECT</h4>
+
+<div class="project-images">
+
+<img src="${project.before_url}">
+
+<img src="${project.during_url}">
+
+<img src="${project.after_url}">
+
+</div>
+
+<button class="delete-btn">Delete</button>
+
+`;
+
+
+const deleteBtn=div.querySelector(".delete-btn");
+
+
+deleteBtn.addEventListener("click",async ()=>{
+
+if(!confirm("Delete this project?")) return;
+
+
+// GET FILE NAMES
+const beforeFile=project.before_url.split("/").pop();
+
+const duringFile=project.during_url.split("/").pop();
+
+const afterFile=project.after_url.split("/").pop();
+
+
+// DELETE FILES
+await supabaseClient.storage
+
+.from("projects")
+
+.remove([beforeFile,duringFile,afterFile]);
+
+
+// DELETE ROW
+await supabaseClient
+
+.from("projects")
+
+.delete()
+
+.eq("id",project.id);
+
+
+div.remove();
+
+alert("Project Deleted");
+
+});
+
+
+projectList.appendChild(div);
+
+});
+
+}
 
 </script>
 
