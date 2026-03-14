@@ -1,4 +1,4 @@
-/* GENERAL PAGE */
+/* PAGE */
 
 body{
 font-family: Arial, Helvetica, sans-serif;
@@ -11,16 +11,16 @@ align-items:flex-start;
 min-height:100vh;
 }
 
-/* CONTAINER */
+/* MAIN CONTAINER */
 
 .admin-container{
-width:90%;
+width:95%;
 max-width:700px;
 background:white;
-padding:30px;
+padding:35px;
 margin-top:40px;
 border-radius:10px;
-box-shadow:0 8px 20px rgba(0,0,0,0.1);
+box-shadow:0 8px 20px rgba(0,0,0,0.08);
 }
 
 /* HEADINGS */
@@ -36,8 +36,17 @@ color:#222;
 form{
 display:flex;
 flex-direction:column;
-gap:12px;
-margin-bottom:30px;
+gap:16px;
+margin-bottom:35px;
+}
+
+/* LABELS */
+
+label{
+font-weight:600;
+color:#333;
+font-size:14px;
+margin-top:5px;
 }
 
 /* INPUTS */
@@ -48,12 +57,20 @@ padding:12px;
 border-radius:6px;
 border:1px solid #ccc;
 font-size:15px;
+background:white;
 }
 
 input:focus,
 select:focus{
 outline:none;
 border-color:#000;
+}
+
+/* FILE INPUT */
+
+input[type="file"]{
+background:#fafafa;
+padding:8px;
 }
 
 /* BUTTONS */
@@ -83,6 +100,7 @@ background:#333;
 #admin-form button[type="submit"]{
 background:#007bff;
 color:white;
+margin-top:10px;
 }
 
 #admin-form button[type="submit"]:hover{
@@ -94,6 +112,7 @@ background:#0056b3;
 #logout{
 background:#444;
 color:white;
+margin-top:5px;
 }
 
 #logout:hover{
@@ -108,14 +127,14 @@ margin-top:40px;
 
 .project-item{
 border:1px solid #ddd;
-padding:15px;
+padding:18px;
 border-radius:8px;
 margin-bottom:20px;
 background:#fafafa;
 }
 
 .project-item h4{
-margin:0 0 10px 0;
+margin-bottom:12px;
 color:#333;
 }
 
@@ -123,22 +142,22 @@ color:#333;
 
 .project-images{
 display:flex;
-gap:10px;
+gap:12px;
 flex-wrap:wrap;
+margin-bottom:10px;
 }
 
 .project-images img{
 width:110px;
 height:80px;
 object-fit:cover;
-border-radius:5px;
+border-radius:6px;
 border:1px solid #ddd;
 }
 
 /* DELETE BUTTON */
 
 .delete-btn{
-margin-top:10px;
 background:#e53935;
 color:white;
 padding:8px 14px;
@@ -155,8 +174,7 @@ background:#c62828;
 @media(max-width:600px){
 
 .admin-container{
-width:95%;
-padding:20px;
+padding:25px;
 }
 
 .project-images img{
