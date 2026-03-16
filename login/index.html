@@ -13,7 +13,6 @@
 
 </head>
 
-
 <body>
 
 <div class="admin-container">
@@ -29,7 +28,6 @@
 <button type="submit">Login</button>
 
 </form>
-
 
 <form id="admin-form" style="display:none;">
 
@@ -52,35 +50,31 @@
 <label>After Image</label>
 <input type="file" id="after" required>
 
-<button type="submit">Publish Project</button>
+<button type="submit" id="publishBtn">Publish Project</button>
+
+<div id="loader" class="loader"></div>
 
 <button type="button" id="logout">Logout</button>
 
 </form>
 
-
 <div id="project-list" class="project-list"></div>
 
 </div>
 
-
-
 <script>
 
 const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
-
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZWV3ZHJ5cXBybW1pdmV2dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjI5NTUsImV4cCI6MjA4ODgzODk1NX0.iEGsupGU9cm-irl6Yq00sz3YruxVmeW8IHQW62f7MbI";
+const supabaseKey = "YOUR_PUBLIC_ANON_KEY";
 
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-
 
 const loginForm = document.getElementById("login-form");
 const adminForm = document.getElementById("admin-form");
 const logoutBtn = document.getElementById("logout");
 const projectList = document.getElementById("project-list");
-
-
+const loader = document.getElementById("loader");
+const publishBtn = document.getElementById("publishBtn");
 
 async function checkSession(){
 
@@ -99,8 +93,6 @@ loadProjects();
 
 checkSession();
 
-
-
 loginForm.addEventListener("submit", async (e)=>{
 
 e.preventDefault();
@@ -114,10 +106,8 @@ password:password
 });
 
 if(error){
-
 alert(error.message);
 return;
-
 }
 
 loginForm.style.display="none";
@@ -126,8 +116,6 @@ adminForm.style.display="block";
 loadProjects();
 
 });
-
-
 
 logoutBtn.addEventListener("click", async ()=>{
 
@@ -140,11 +128,13 @@ projectList.innerHTML="";
 
 });
 
-
-
 adminForm.addEventListener("submit", async (e)=>{
 
 e.preventDefault();
+
+loader.style.display="block";
+publishBtn.disabled=true;
+publishBtn.innerText="Publishing...";
 
 const category=document.getElementById("category").value;
 
@@ -156,19 +146,15 @@ const beforeName=Date.now()+"-"+beforeFile.name;
 const duringName=Date.now()+"-"+duringFile.name;
 const afterName=Date.now()+"-"+afterFile.name;
 
-
-
-await supabaseClient.storage.from("projects").upload(beforeName,beforeFile);
-await supabaseClient.storage.from("projects").upload(duringName,duringFile);
-await supabaseClient.storage.from("projects").upload(afterName,afterFile);
-
-
+await Promise.all([
+supabaseClient.storage.from("projects").upload(beforeName,beforeFile),
+supabaseClient.storage.from("projects").upload(duringName,duringFile),
+supabaseClient.storage.from("projects").upload(afterName,afterFile)
+]);
 
 const beforeURL=supabaseClient.storage.from("projects").getPublicUrl(beforeName).data.publicUrl;
 const duringURL=supabaseClient.storage.from("projects").getPublicUrl(duringName).data.publicUrl;
 const afterURL=supabaseClient.storage.from("projects").getPublicUrl(afterName).data.publicUrl;
-
-
 
 const { error } = await supabaseClient.from("projects").insert([{
 
@@ -179,12 +165,13 @@ after_url:afterURL
 
 }]);
 
+loader.style.display="none";
+publishBtn.disabled=false;
+publishBtn.innerText="Publish Project";
 
 if(error){
-
 alert(error.message);
 return;
-
 }
 
 alert("Project Published");
@@ -195,8 +182,6 @@ loadProjects();
 
 });
 
-
-
 async function loadProjects(){
 
 projectList.innerHTML="";
@@ -206,14 +191,10 @@ const { data, error } = await supabaseClient
 .select("*")
 .order("created_at",{ascending:false});
 
-
 if(error){
-
 console.log(error);
 return;
-
 }
-
 
 data.forEach(project=>{
 
@@ -237,59 +218,40 @@ div.innerHTML=`
 
 `;
 
-
 const deleteBtn=div.querySelector(".delete-btn");
-
 
 deleteBtn.addEventListener("click", async ()=>{
 
 if(!confirm("Delete this project?")) return;
 
-
-
 const beforeFile=project.before_url.split("/").pop();
 const duringFile=project.during_url.split("/").pop();
 const afterFile=project.after_url.split("/").pop();
-
-
 
 const { error:storageError } = await supabaseClient.storage
 .from("projects")
 .remove([beforeFile,duringFile,afterFile]);
 
-
 if(storageError){
-
 alert("Failed to delete images");
-console.log(storageError);
 return;
-
 }
-
-
 
 const { error:dbError } = await supabaseClient
 .from("projects")
 .delete()
 .eq("id",project.id);
 
-
 if(dbError){
-
 alert("Failed to delete project");
-console.log(dbError);
 return;
-
 }
-
-
 
 div.remove();
 
 alert("Project Deleted");
 
 });
-
 
 projectList.appendChild(div);
 
@@ -298,7 +260,6 @@ projectList.appendChild(div);
 }
 
 </script>
-
 
 </body>
 </html>
