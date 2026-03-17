@@ -5,11 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Flexx Interior</title>
 
-<!-- Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="styles.css">
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -20,9 +18,10 @@
     <button class="menu-toggle" id="menu-toggle"><i class="fa fa-bars"></i></button>
     <ul class="nav-links" id="nav-links">
       <li><a href="#about">About</a></li>
-      <li><a href="#kitchen">Kitchen Projects</a></li>
-      <li><a href="#living">Living Room</a></li>
-      <li><a href="#bedroom">Bedroom</a></li>
+      <li><a href="#kitchen">Kitchen</a></li>
+      <li><a href="#living">TV Wall</a></li>
+      <li><a href="#bedroom">Wardrobe</a></li>
+      <li><a href="#others">Others</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </nav>
@@ -30,41 +29,44 @@
 
 <section class="hero">
   <h2>Modern Interior Design</h2>
-  <p>Beautiful kitchen, bedroom and living room interiors designed with precision and quality materials.</p>
+  <p>Beautiful interiors designed with precision and quality.</p>
   <a href="#contact" class="btn">Request a Quote</a>
 </section>
 
 <section id="about" class="section">
   <h2>About Flexx Interior</h2>
-  <p>Flexx Interior specializes in modern interior designs using high-quality boards and plywood.</p>
+  <p>We specialize in modern interiors using high-quality materials.</p>
 </section>
 
-<!-- KITCHEN -->
 <section id="kitchen" class="section">
   <h2>Kitchen Projects</h2>
   <div class="gallery" id="kitchen-gallery"></div>
 </section>
 
-<!-- LIVING ROOM -->
 <section id="living" class="section">
-  <h2>Living Room TV Wall Units</h2>
+  <h2>TV Wall Units</h2>
   <div class="gallery" id="living-gallery"></div>
 </section>
 
-<!-- BEDROOM -->
 <section id="bedroom" class="section">
-  <h2>Bedroom Wardrobes</h2>
+  <h2>Wardrobes</h2>
   <div class="gallery" id="bedroom-gallery"></div>
 </section>
 
+<!-- ✅ NEW OTHERS -->
+<section id="others" class="section">
+  <h2>Other Projects</h2>
+  <div class="gallery" id="others-gallery"></div>
+</section>
+
 <section id="contact" class="section">
-  <h2>Contact Us</h2>
+  <h2>Contact</h2>
   <form action="https://formsubmit.co/91dc9ef5428d559ae71abd74a65e57b1" method="POST">
     <input type="text" name="name" placeholder="First Name" required>
     <input type="text" name="lastname" placeholder="Last Name" required>
     <input type="email" name="email" placeholder="Email">
-    <textarea name="message" placeholder="Write your message"></textarea>
-    <button type="submit">Send Message</button>
+    <textarea name="message" placeholder="Message"></textarea>
+    <button type="submit">Send</button>
   </form>
 </section>
 
@@ -74,11 +76,6 @@
 
 <footer>
   <p>© 2026 Flexx Interior</p>
-  <div class="social">
-    <i class="fa-brands fa-facebook"></i>
-    <i class="fa-brands fa-instagram"></i>
-    <i class="fa-solid fa-phone"></i>
-  </div>
 </footer>
 
 <script>
@@ -90,56 +87,87 @@ toggleButton.addEventListener("click", () => {
   navLinks.classList.toggle("active");
 });
 
-document.querySelectorAll("#nav-links a").forEach(link => {
-  link.addEventListener("click", () => {
-    navLinks.classList.remove("active");
-  });
-});
+// SUPABASE
+const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
+const supabaseKey = "YOUR_PUBLIC_KEY";
+const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-// SUPABASE PROJECTS FETCH AND IMAGE CYCLE
-if (typeof supabase !== "undefined") {
+// LOAD PROJECTS WITH ARROWS
+async function loadProjects(category, galleryId) {
 
-  const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
-  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwZWV3ZHJ5cXBybW1pdmV2dHN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMyNjI5NTUsImV4cCI6MjA4ODgzODk1NX0.iEGsupGU9cm-irl6Yq00sz3YruxVmeW8IHQW62f7MbI";
+  const { data } = await client
+    .from("projects")
+    .select("*")
+    .eq("category", category)
+    .order("created_at", { ascending: false });
 
-  const client = supabase.createClient(supabaseUrl, supabaseKey);
+  const gallery = document.getElementById(galleryId);
+  gallery.innerHTML = "";
 
-  async function loadProjects(category, galleryId) {
-    const { data } = await client
-      .from("projects")
-      .select("*")
-      .eq("category", category)
-      .order("created_at", { ascending: false });
+  data.forEach(project => {
 
-    const gallery = document.getElementById(galleryId);
-    gallery.innerHTML = "";
+    const card = document.createElement("div");
+    card.className = "project-card";
 
-    data.forEach(project => {
-      const card = document.createElement("div");
-      card.className = "project-card";
+    const images = [
+      project.before_url,
+      project.during_url,
+      project.after_url
+    ];
 
-      // Set up cycling images
-      const images = [project.before_url, project.during_url, project.after_url];
-      let index = 2; // Start with AFTER image
-      const img = document.createElement("img");
+    let index = 2;
+
+    const container = document.createElement("div");
+    container.style.position = "relative";
+
+    const img = document.createElement("img");
+    img.src = images[index];
+
+    // LEFT ARROW
+    const prev = document.createElement("button");
+    prev.innerHTML = "❮";
+    prev.className = "arrow left";
+
+    prev.onclick = () => {
+      index = (index - 1 + images.length) % images.length;
       img.src = images[index];
-      img.className = "project-img";
+    };
 
-      img.addEventListener("click", () => {
-        index = (index + 1) % images.length;
-        img.src = images[index];
-      });
+    // RIGHT ARROW
+    const next = document.createElement("button");
+    next.innerHTML = "❯";
+    next.className = "arrow right";
 
-      card.appendChild(img);
-      gallery.appendChild(card);
-    });
-  }
+    next.onclick = () => {
+      index = (index + 1) % images.length;
+      img.src = images[index];
+    };
 
-  // Load projects for each category
-  loadProjects("kitchen","kitchen-gallery");
-  loadProjects("living","living-gallery");
-  loadProjects("bedroom","bedroom-gallery");
+    container.appendChild(img);
+    container.appendChild(prev);
+    container.appendChild(next);
+
+    card.appendChild(container);
+
+    // SHOW NAME IF "OTHERS"
+    if(project.project_name){
+      const title = document.createElement("p");
+      title.innerText = project.project_name;
+      title.style.fontWeight = "bold";
+      title.style.marginTop = "8px";
+      card.appendChild(title);
+    }
+
+    gallery.appendChild(card);
+  });
 }
+
+// LOAD ALL
+loadProjects("kitchen","kitchen-gallery");
+loadProjects("living","living-gallery");
+loadProjects("bedroom","bedroom-gallery");
+loadProjects("others","others-gallery");
 </script>
+
 </body>
 </html>

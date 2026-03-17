@@ -140,6 +140,27 @@ body{
   transform:scale(1.05);
 }
 
+.arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(0,0,0,0.5);
+  color:white;
+  border:none;
+  padding:8px 12px;
+  cursor:pointer;
+  font-size:18px;
+  border-radius:4px;
+}
+
+.arrow.left{
+  left:5px;
+}
+
+.arrow.right{
+  right:5px;
+}
+
 /* ===== CONTACT FORM ===== */
 form{
   max-width:500px;

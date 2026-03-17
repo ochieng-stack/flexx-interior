@@ -1,72 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Flexx Interior Admin</title>
-
 <link rel="stylesheet" href="admin.css">
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 </head>
 
 <body>
 
 <div class="admin-container">
 
-<h2>Admin Login</h2>
+  <h2>Admin Login</h2>
 
-<form id="login-form">
+  <form id="login-form">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+  </form>
 
-<input type="email" id="email" placeholder="Email" required>
+  <form id="admin-form" style="display:none;">
+    <h2>Upload Project</h2>
 
-<input type="password" id="password" placeholder="Password" required>
+    <label>Category</label>
+    <select id="category">
+      <option value="kitchen">Kitchen</option>
+      <option value="wardrobe">Wardrobe</option>
+      <option value="tv_wall">TV Wall</option>
+      <option value="others">Others</option>
+    </select>
 
-<button type="submit">Login</button>
+    <!-- Shown only if "Others" is selected -->
+    <div id="other-name-container" style="display:none;">
+      <label>Specify Project Name</label>
+      <input type="text" id="other-name" placeholder="E.g., Bookshelf, Pantry">
+    </div>
 
-</form>
+    <label>Before Image</label>
+    <input type="file" id="before" required>
 
-<form id="admin-form" style="display:none;">
+    <label>During Image</label>
+    <input type="file" id="during" required>
 
-<h2>Upload Project</h2>
+    <label>After Image</label>
+    <input type="file" id="after" required>
 
-<label>Category</label>
+    <button type="submit" id="publishBtn">Publish Project</button>
+    <div id="loader" class="loader"></div>
+    <button type="button" id="logout">Logout</button>
 
-<select id="category">
-<option value="kitchen">Kitchen</option>
-<option value="living">Living Room</option>
-<option value="bedroom">Bedroom</option>
-</select>
+  </form>
 
-<label>Before Image</label>
-<input type="file" id="before" required>
-
-<label>During Image</label>
-<input type="file" id="during" required>
-
-<label>After Image</label>
-<input type="file" id="after" required>
-
-<button type="submit" id="publishBtn">Publish Project</button>
-
-<div id="loader" class="loader"></div>
-
-<button type="button" id="logout">Logout</button>
-
-</form>
-
-<div id="project-list" class="project-list"></div>
+  <div id="project-list" class="project-list"></div>
 
 </div>
 
 <script>
-
 const supabaseUrl = "https://wpeewdryqprmmivevtsu.supabase.co";
 const supabaseKey = "YOUR_PUBLIC_ANON_KEY";
-
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 const loginForm = document.getElementById("login-form");
@@ -75,190 +67,152 @@ const logoutBtn = document.getElementById("logout");
 const projectList = document.getElementById("project-list");
 const loader = document.getElementById("loader");
 const publishBtn = document.getElementById("publishBtn");
+const categorySelect = document.getElementById("category");
+const otherNameContainer = document.getElementById("other-name-container");
+const otherNameInput = document.getElementById("other-name");
 
+// Show/hide "Specify Project Name" field if Others is selected
+categorySelect.addEventListener("change", () => {
+  if(categorySelect.value === "others"){
+    otherNameContainer.style.display = "block";
+    otherNameInput.required = true;
+  } else {
+    otherNameContainer.style.display = "none";
+    otherNameInput.required = false;
+  }
+});
+
+// Check session
 async function checkSession(){
-
-const { data } = await supabaseClient.auth.getSession();
-
-if(data.session){
-
-loginForm.style.display="none";
-adminForm.style.display="block";
-
-loadProjects();
-
+  const { data } = await supabaseClient.auth.getSession();
+  if(data.session){
+    loginForm.style.display="none";
+    adminForm.style.display="block";
+    loadProjects();
+  }
 }
-
-}
-
 checkSession();
 
+// Login
 loginForm.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-e.preventDefault();
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+  if(error){ alert(error.message); return; }
 
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
-
-const { error } = await supabaseClient.auth.signInWithPassword({
-email:email,
-password:password
+  loginForm.style.display="none";
+  adminForm.style.display="block";
+  loadProjects();
 });
 
-if(error){
-alert(error.message);
-return;
-}
-
-loginForm.style.display="none";
-adminForm.style.display="block";
-
-loadProjects();
-
-});
-
+// Logout
 logoutBtn.addEventListener("click", async ()=>{
-
-await supabaseClient.auth.signOut();
-
-loginForm.style.display="block";
-adminForm.style.display="none";
-
-projectList.innerHTML="";
-
+  await supabaseClient.auth.signOut();
+  loginForm.style.display="block";
+  adminForm.style.display="none";
+  projectList.innerHTML="";
 });
 
+// Upload project
 adminForm.addEventListener("submit", async (e)=>{
+  e.preventDefault();
 
-e.preventDefault();
+  loader.style.display = "block";
+  publishBtn.disabled = true;
+  publishBtn.innerText = "Publishing...";
 
-loader.style.display="block";
-publishBtn.disabled=true;
-publishBtn.innerText="Publishing...";
+  const category = categorySelect.value;
+  const projectName = category === "others" ? otherNameInput.value.trim() : "";
 
-const category=document.getElementById("category").value;
+  const beforeFile = document.getElementById("before").files[0];
+  const duringFile = document.getElementById("during").files[0];
+  const afterFile = document.getElementById("after").files[0];
 
-const beforeFile=document.getElementById("before").files[0];
-const duringFile=document.getElementById("during").files[0];
-const afterFile=document.getElementById("after").files[0];
+  const beforeName = Date.now()+"-"+beforeFile.name;
+  const duringName = Date.now()+"-"+duringFile.name;
+  const afterName = Date.now()+"-"+afterFile.name;
 
-const beforeName=Date.now()+"-"+beforeFile.name;
-const duringName=Date.now()+"-"+duringFile.name;
-const afterName=Date.now()+"-"+afterFile.name;
+  // Upload all images simultaneously
+  await Promise.all([
+    supabaseClient.storage.from("projects").upload(beforeName,beforeFile),
+    supabaseClient.storage.from("projects").upload(duringName,duringFile),
+    supabaseClient.storage.from("projects").upload(afterName,afterFile)
+  ]);
 
-await Promise.all([
-supabaseClient.storage.from("projects").upload(beforeName,beforeFile),
-supabaseClient.storage.from("projects").upload(duringName,duringFile),
-supabaseClient.storage.from("projects").upload(afterName,afterFile)
-]);
+  const beforeURL = supabaseClient.storage.from("projects").getPublicUrl(beforeName).data.publicUrl;
+  const duringURL = supabaseClient.storage.from("projects").getPublicUrl(duringName).data.publicUrl;
+  const afterURL = supabaseClient.storage.from("projects").getPublicUrl(afterName).data.publicUrl;
 
-const beforeURL=supabaseClient.storage.from("projects").getPublicUrl(beforeName).data.publicUrl;
-const duringURL=supabaseClient.storage.from("projects").getPublicUrl(duringName).data.publicUrl;
-const afterURL=supabaseClient.storage.from("projects").getPublicUrl(afterName).data.publicUrl;
+  const { error } = await supabaseClient.from("projects").insert([{
+    category: category,
+    project_name: projectName, // NEW FIELD for Others
+    before_url: beforeURL,
+    during_url: duringURL,
+    after_url: afterURL
+  }]);
 
-const { error } = await supabaseClient.from("projects").insert([{
+  loader.style.display = "none";
+  publishBtn.disabled = false;
+  publishBtn.innerText = "Publish Project";
 
-category:category,
-before_url:beforeURL,
-during_url:duringURL,
-after_url:afterURL
+  if(error){ alert(error.message); return; }
 
-}]);
-
-loader.style.display="none";
-publishBtn.disabled=false;
-publishBtn.innerText="Publish Project";
-
-if(error){
-alert(error.message);
-return;
-}
-
-alert("Project Published");
-
-adminForm.reset();
-
-loadProjects();
-
+  alert("Project Published!");
+  adminForm.reset();
+  otherNameContainer.style.display = "none";
+  loadProjects();
 });
 
+// Load projects
 async function loadProjects(){
+  projectList.innerHTML="";
+  const { data, error } = await supabaseClient
+    .from("projects")
+    .select("*")
+    .order("created_at",{ascending:false});
 
-projectList.innerHTML="";
+  if(error){ console.log(error); return; }
 
-const { data, error } = await supabaseClient
-.from("projects")
-.select("*")
-.order("created_at",{ascending:false});
+  data.forEach(project=>{
+    const div = document.createElement("div");
+    div.className = "project-item";
 
-if(error){
-console.log(error);
-return;
+    div.innerHTML = `
+      <h4>${project.category.toUpperCase()} ${project.project_name ? "- "+project.project_name : ""}</h4>
+      <div class="project-images">
+        <img src="${project.before_url}">
+        <img src="${project.during_url}">
+        <img src="${project.after_url}">
+      </div>
+      <button class="delete-btn">Delete</button>
+    `;
+
+    const deleteBtn = div.querySelector(".delete-btn");
+    deleteBtn.addEventListener("click", async ()=>{
+      if(!confirm("Delete this project?")) return;
+
+      const beforeFile = project.before_url.split("/").pop();
+      const duringFile = project.during_url.split("/").pop();
+      const afterFile = project.after_url.split("/").pop();
+
+      const { error:storageError } = await supabaseClient.storage
+        .from("projects")
+        .remove([beforeFile,duringFile,afterFile]);
+      if(storageError){ alert("Failed to delete images"); return; }
+
+      const { error:dbError } = await supabaseClient.from("projects")
+        .delete().eq("id",project.id);
+      if(dbError){ alert("Failed to delete project"); return; }
+
+      div.remove();
+      alert("Project Deleted");
+    });
+
+    projectList.appendChild(div);
+  });
 }
-
-data.forEach(project=>{
-
-const div=document.createElement("div");
-
-div.className="project-item";
-
-div.innerHTML=`
-
-<h4>${project.category.toUpperCase()} PROJECT</h4>
-
-<div class="project-images">
-
-<img src="${project.before_url}">
-<img src="${project.during_url}">
-<img src="${project.after_url}">
-
-</div>
-
-<button class="delete-btn">Delete</button>
-
-`;
-
-const deleteBtn=div.querySelector(".delete-btn");
-
-deleteBtn.addEventListener("click", async ()=>{
-
-if(!confirm("Delete this project?")) return;
-
-const beforeFile=project.before_url.split("/").pop();
-const duringFile=project.during_url.split("/").pop();
-const afterFile=project.after_url.split("/").pop();
-
-const { error:storageError } = await supabaseClient.storage
-.from("projects")
-.remove([beforeFile,duringFile,afterFile]);
-
-if(storageError){
-alert("Failed to delete images");
-return;
-}
-
-const { error:dbError } = await supabaseClient
-.from("projects")
-.delete()
-.eq("id",project.id);
-
-if(dbError){
-alert("Failed to delete project");
-return;
-}
-
-div.remove();
-
-alert("Project Deleted");
-
-});
-
-projectList.appendChild(div);
-
-});
-
-}
-
 </script>
 
 </body>
